@@ -20,4 +20,10 @@ namespace PriceChecker.Common
             Types = new List<FieldType>();
         }
     }
+
+    public class SupplierFiles
+    {
+        public string NameSupplier;
+        public string NamePriceFile;
+    }
 }

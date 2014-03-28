@@ -41,14 +41,18 @@
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.btnClose = new System.Windows.Forms.Button();
             this.button3 = new System.Windows.Forms.Button();
-            this.textBox2 = new System.Windows.Forms.TextBox();
-            this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.button2 = new System.Windows.Forms.Button();
+            this.searchString = new System.Windows.Forms.TextBox();
+            this.searchGrid = new System.Windows.Forms.DataGridView();
+            this.NameSupplier = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.FileName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.findGridList = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.removeSupplierFromList = new System.Windows.Forms.ToolStripMenuItem();
+            this.addToSearch = new System.Windows.Forms.Button();
             this.label5 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.button1 = new System.Windows.Forms.Button();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
+            this.fileNameChange = new System.Windows.Forms.TextBox();
+            this.btnChangeFile = new System.Windows.Forms.Button();
+            this.comboBoxSupplier = new System.Windows.Forms.ComboBox();
             this.listWordsMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.deleteWords = new System.Windows.Forms.ToolStripMenuItem();
             this.addWords = new System.Windows.Forms.ToolStripMenuItem();
@@ -61,7 +65,8 @@
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.searchGrid)).BeginInit();
+            this.findGridList.SuspendLayout();
             this.listWordsMenu.SuspendLayout();
             this.listSynonimMenu.SuspendLayout();
             this.listSupplierMenu.SuspendLayout();
@@ -158,14 +163,14 @@
             // 
             this.groupBox3.Controls.Add(this.btnClose);
             this.groupBox3.Controls.Add(this.button3);
-            this.groupBox3.Controls.Add(this.textBox2);
-            this.groupBox3.Controls.Add(this.dataGridView1);
-            this.groupBox3.Controls.Add(this.button2);
+            this.groupBox3.Controls.Add(this.searchString);
+            this.groupBox3.Controls.Add(this.searchGrid);
+            this.groupBox3.Controls.Add(this.addToSearch);
             this.groupBox3.Controls.Add(this.label5);
             this.groupBox3.Controls.Add(this.label4);
-            this.groupBox3.Controls.Add(this.textBox1);
-            this.groupBox3.Controls.Add(this.button1);
-            this.groupBox3.Controls.Add(this.comboBox1);
+            this.groupBox3.Controls.Add(this.fileNameChange);
+            this.groupBox3.Controls.Add(this.btnChangeFile);
+            this.groupBox3.Controls.Add(this.comboBoxSupplier);
             this.groupBox3.Location = new System.Drawing.Point(12, 257);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Size = new System.Drawing.Size(676, 389);
@@ -192,30 +197,67 @@
             this.button3.TabIndex = 8;
             this.button3.Text = "Искать";
             this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.SearchClick);
             // 
-            // textBox2
+            // searchString
             // 
-            this.textBox2.Location = new System.Drawing.Point(182, 78);
-            this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(488, 20);
-            this.textBox2.TabIndex = 7;
+            this.searchString.Location = new System.Drawing.Point(87, 359);
+            this.searchString.Name = "searchString";
+            this.searchString.Size = new System.Drawing.Size(488, 20);
+            this.searchString.TabIndex = 7;
             // 
-            // dataGridView1
+            // searchGrid
             // 
-            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Location = new System.Drawing.Point(6, 105);
-            this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.Size = new System.Drawing.Size(664, 245);
-            this.dataGridView1.TabIndex = 6;
+            this.searchGrid.AllowUserToAddRows = false;
+            this.searchGrid.AllowUserToDeleteRows = false;
+            this.searchGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.searchGrid.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.NameSupplier,
+            this.FileName});
+            this.searchGrid.ContextMenuStrip = this.findGridList;
+            this.searchGrid.Location = new System.Drawing.Point(6, 105);
+            this.searchGrid.MultiSelect = false;
+            this.searchGrid.Name = "searchGrid";
+            this.searchGrid.ReadOnly = true;
+            this.searchGrid.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.searchGrid.Size = new System.Drawing.Size(664, 245);
+            this.searchGrid.TabIndex = 6;
             // 
-            // button2
+            // NameSupplier
             // 
-            this.button2.Location = new System.Drawing.Point(6, 76);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(170, 23);
-            this.button2.TabIndex = 5;
-            this.button2.Text = "Добавить в список поиска";
-            this.button2.UseVisualStyleBackColor = true;
+            this.NameSupplier.HeaderText = "Наименование поставщика";
+            this.NameSupplier.Name = "NameSupplier";
+            this.NameSupplier.ReadOnly = true;
+            // 
+            // FileName
+            // 
+            this.FileName.HeaderText = "Прайс лист";
+            this.FileName.Name = "FileName";
+            this.FileName.ReadOnly = true;
+            // 
+            // findGridList
+            // 
+            this.findGridList.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.removeSupplierFromList});
+            this.findGridList.Name = "findGridList";
+            this.findGridList.Size = new System.Drawing.Size(189, 26);
+            // 
+            // removeSupplierFromList
+            // 
+            this.removeSupplierFromList.Name = "removeSupplierFromList";
+            this.removeSupplierFromList.Size = new System.Drawing.Size(188, 22);
+            this.removeSupplierFromList.Text = "Удалить поставщика";
+            this.removeSupplierFromList.Click += new System.EventHandler(this.RemoveSupplierFromListClick);
+            // 
+            // addToSearch
+            // 
+            this.addToSearch.Location = new System.Drawing.Point(6, 59);
+            this.addToSearch.Name = "addToSearch";
+            this.addToSearch.Size = new System.Drawing.Size(170, 40);
+            this.addToSearch.TabIndex = 5;
+            this.addToSearch.Text = "Добавить в список поиска";
+            this.addToSearch.UseVisualStyleBackColor = true;
+            this.addToSearch.Click += new System.EventHandler(this.AddSupplierToSearchGrid);
             // 
             // label5
             // 
@@ -235,29 +277,30 @@
             this.label4.TabIndex = 3;
             this.label4.Text = "Выбор поставщика";
             // 
-            // textBox1
+            // fileNameChange
             // 
-            this.textBox1.Location = new System.Drawing.Point(258, 33);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(191, 20);
-            this.textBox1.TabIndex = 2;
+            this.fileNameChange.Location = new System.Drawing.Point(258, 33);
+            this.fileNameChange.Name = "fileNameChange";
+            this.fileNameChange.Size = new System.Drawing.Size(191, 20);
+            this.fileNameChange.TabIndex = 2;
             // 
-            // button1
+            // btnChangeFile
             // 
-            this.button1.Location = new System.Drawing.Point(455, 33);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(114, 23);
-            this.button1.TabIndex = 1;
-            this.button1.Text = "Выбор файла";
-            this.button1.UseVisualStyleBackColor = true;
+            this.btnChangeFile.Location = new System.Drawing.Point(455, 33);
+            this.btnChangeFile.Name = "btnChangeFile";
+            this.btnChangeFile.Size = new System.Drawing.Size(114, 23);
+            this.btnChangeFile.TabIndex = 1;
+            this.btnChangeFile.Text = "Выбор файла";
+            this.btnChangeFile.UseVisualStyleBackColor = true;
+            this.btnChangeFile.Click += new System.EventHandler(this.BtnChangeFileClick);
             // 
-            // comboBox1
+            // comboBoxSupplier
             // 
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Location = new System.Drawing.Point(6, 32);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(246, 21);
-            this.comboBox1.TabIndex = 0;
+            this.comboBoxSupplier.FormattingEnabled = true;
+            this.comboBoxSupplier.Location = new System.Drawing.Point(6, 32);
+            this.comboBoxSupplier.Name = "comboBoxSupplier";
+            this.comboBoxSupplier.Size = new System.Drawing.Size(246, 21);
+            this.comboBoxSupplier.TabIndex = 0;
             // 
             // listWordsMenu
             // 
@@ -316,6 +359,7 @@
             this.deleteSupplier.Name = "deleteSupplier";
             this.deleteSupplier.Size = new System.Drawing.Size(196, 22);
             this.deleteSupplier.Text = "Удалить поставщика";
+            this.deleteSupplier.Click += new System.EventHandler(this.DeleteSupplierClick);
             // 
             // addSupplier
             // 
@@ -334,13 +378,15 @@
             this.Controls.Add(this.groupBox1);
             this.Name = "MainForm";
             this.Text = "Поисковик";
+            this.Shown += new System.EventHandler(this.MainForm_Shown);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.searchGrid)).EndInit();
+            this.findGridList.ResumeLayout(false);
             this.listWordsMenu.ResumeLayout(false);
             this.listSynonimMenu.ResumeLayout(false);
             this.listSupplierMenu.ResumeLayout(false);
@@ -360,14 +406,14 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.ListBox listWords;
         private System.Windows.Forms.GroupBox groupBox3;
-        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button addToSearch;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.ComboBox comboBox1;
-        private System.Windows.Forms.DataGridView dataGridView1;
-        private System.Windows.Forms.TextBox textBox2;
+        private System.Windows.Forms.TextBox fileNameChange;
+        private System.Windows.Forms.Button btnChangeFile;
+        private System.Windows.Forms.ComboBox comboBoxSupplier;
+        private System.Windows.Forms.DataGridView searchGrid;
+        private System.Windows.Forms.TextBox searchString;
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.ContextMenuStrip listWordsMenu;
         private System.Windows.Forms.ContextMenuStrip listSynonimMenu;
@@ -379,6 +425,10 @@
         private System.Windows.Forms.ToolStripMenuItem deleteSupplier;
         private System.Windows.Forms.ToolStripMenuItem addSupplier;
         private System.Windows.Forms.Button btnClose;
+        private System.Windows.Forms.DataGridViewTextBoxColumn NameSupplier;
+        private System.Windows.Forms.DataGridViewTextBoxColumn FileName;
+        private System.Windows.Forms.ContextMenuStrip findGridList;
+        private System.Windows.Forms.ToolStripMenuItem removeSupplierFromList;
     }
 }
 
