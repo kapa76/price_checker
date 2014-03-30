@@ -74,6 +74,7 @@ namespace PriceChecker
         private void Supplier_Shown(object sender, EventArgs e)
         {
             suppName.Text = Supp.Name;
+            sheet.Text = Supp.SheetNumber.ToString();
 
             for (int i = 0; i < Supp.ListCell.Count; i++)
             {
@@ -131,6 +132,7 @@ namespace PriceChecker
         private void BtnSaveClick(object sender, EventArgs e)
         {
             Supp.Name = suppName.Text;
+            Supp.SheetNumber = Convert.ToInt32(sheet.Text);
             SaveFields();
         }
 
@@ -138,7 +140,17 @@ namespace PriceChecker
         {
             if (grid.SelectedRows.Count > 0)
             {
+                var nameRemoved = (string)grid.SelectedRows[0].Cells[2].Value;
                 grid.Rows.Remove(grid.SelectedRows[0]);
+
+                for (int i = 0; i < Supp.ListCell.Count; i++)
+                {
+                    if (Supp.ListCell[i].Name.Contains(nameRemoved))
+                    {
+                        Supp.ListCell.RemoveAt(i);
+                    }
+                }
+
             }
         }
 

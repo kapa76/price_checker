@@ -251,6 +251,7 @@ namespace PriceChecker
 
         private void SearchClick(object sender, EventArgs e)
         {
+            var value = new List<ResultRowCell>();
             var lf = new List<SupplierFiles>();
             if (searchString.Text.Length > 0)
             {
@@ -262,13 +263,27 @@ namespace PriceChecker
                     lf.Add(s);
                 }
 
-                Search(searchString.Text, LocalWords._words, ListSupplier, lf);
+                value = Search(searchString.Text, LocalWords._words, ListSupplier, lf);
             }
+            else
+            {
+                MessageBox.Show(@"Необходимо указать слова для поиска.");
+            }
+
+            if (value.Count > 0)
+            {
+                var result = new ResultGrid {DataResult = value};
+                result.Show();
+            }
+
+            
+
         }
 
-        private static void Search(string searchString, List<Words> words, List<SupplierType> listSupplier, List<SupplierFiles> lf)
+        private static List<ResultRowCell> Search(string searchString, List<Words> words, List<SupplierType> listSupplier, List<SupplierFiles> lf)
         {
             var searcher = new Search();
+            var p = new List<ResultRowCell>();
             foreach (SupplierFiles supplierFiles in lf)
             {
                 var nameSupplier = supplierFiles.NameSupplier;
@@ -276,26 +291,30 @@ namespace PriceChecker
 
                 var supplierType = GetSupplierByName(listSupplier, nameSupplier);
 
-                string[] listOfWords = GetListWords(words, searchString.Split(','));
+                string[] listOfWords = GetListWords(words, searchString.Split(','), supplierType);
+
+                //del words when with "-"
 
 
-                searcher.SearchByFile(listOfWords, supplierType, priceFileName);
+                p = searcher.SearchByFile(listOfWords, supplierType, priceFileName);
 
             }
 
-
+            return p;
 
 
         }
 
 
 
-        private static string[] GetListWords(List<Words> words, string[] searchWords)
+        private static string[] GetListWords(List<Words> words, string[] searchWords, SupplierType type)
         {
             bool finded = false;
             var wp = new List<string>();
-            for (int i = 0; i < searchWords.Length; i++)
+            int i;
+            for (i = 0; i < searchWords.Length; i++)
             {
+                finded = false;
                 //берем слово и ищем его в списке слов, если находим забираем все синонимы
                 for (int j = 0; j < words.Count; j++)
                 {
@@ -315,8 +334,58 @@ namespace PriceChecker
 
             }
 
+            //добавить/удалить все слова для конкретного поставщика
+            //для каждого слова из поисковой строки
+            for (i = 0; i < searchWords.Length; i++)
+            {
+                for (int j = 0; j < type.ListWords._words.Count; j++)
+                {
+                    //по всем словам поставщика
+                    if (type.ListWords._words[j]._words.Contains(searchWords[i]))
+                    {
+                        //в списке слов поставщика, найдено слово из поисковой строки
+                        for (int k = 0; k < type.ListWords._words[j]._synonim.Count; k++)
+                        {
+                            //для всех синонимов для этого слова из поставщика
+                            //если синоним с - убираем его из списка, иначе добавляем
+                            //добавляем все слова синонимы, если оно с минусом то убираем из общего списка.
+                            var value = type.ListWords._words[j]._synonim[k];
+
+                            if (isAdd(value) && !wp.Contains(value))
+                                wp.Add(Normalize(value));
+
+                            if (isRemove(value))
+                                wp.Remove(Normalize(value));
+
+                        }
+                    }
+                }
+            }
+
             return wp.ToArray();
         }
+
+        private static string Normalize(string value)
+        {
+            value = value.Replace("-", "");
+            value = value.Replace("+", "");
+            value = value.Replace(".", "");
+            value = value.Replace(",", "");
+            value = value.Replace("*", "");
+            value = value.Replace(";", "");
+            return value;
+        }
+
+        private static bool isRemove(string value)
+        {
+            return value.StartsWith("-");
+        }
+
+        private static bool isAdd(string value)
+        {
+            return value.StartsWith("+");
+        }
+
 
         private static SupplierType GetSupplierByName(List<SupplierType> listSupplier, string nameSupplier)
         {
@@ -342,10 +411,21 @@ namespace PriceChecker
             
             supplier.vSupplierEditMode = SupplierEditMode.Edit;
             var supplierName = (string)supplierList.Items[supplierList.SelectedIndex];
-            supplier.Supp = GetSupplierByName(ListSupplier, supplierName);
+            var vSupplier = GetSupplierByName(ListSupplier, supplierName);
+            supplier.Supp = vSupplier;
             if (supplier.ShowDialog() == DialogResult.OK)
             {
-                //ListSupplier.Add(supplier.Supp);
+                ListSupplier.Remove(vSupplier);
+                ListSupplier.Add(supplier.Supp);
+                
+                supplierList.Items.Clear();
+                for(int i=0;i<ListSupplier.Count;i++)
+                {
+                    supplierList.Items.Add(ListSupplier[i].Name);
+                }
+                if (supplierList.Items.Count > 0)
+                    supplierList.SelectedIndex = 0;
+
             }
         }
 

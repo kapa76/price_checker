@@ -1,51 +1,87 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
 using Microsoft.Office.Interop.Excel;
 using PriceChecker.Common;
+using Application = Microsoft.Office.Interop.Excel.Application;
 using Excel = Microsoft.Office.Interop.Excel; 
 
 namespace PriceChecker.search
 {
     public class Search
     {
-        public void SearchByFile(string[] listOfWords, SupplierType supplierType, string priceFileName)
+        public List<ResultRowCell> SearchByFile(string[] listOfWords, SupplierType supplierType, string priceFileName)
         {
-            Excel.Application xlApp;
-            Excel.Workbook xlWorkBook;
-            Excel.Worksheet xlWorkSheet;
-            Excel.Range range;
+            Application xlApp = new Excel.ApplicationClass();
+            xlApp.ReferenceStyle = XlReferenceStyle.xlA1;
+            Workbook xlWorkBook = xlApp.Workbooks.Open(priceFileName, 0, true, 5, "", "", true, Microsoft.Office.Interop.Excel.XlPlatform.xlWindows, "\t", false, false, 0, true, 1, 0);
 
-            string str;
-            int rCnt = 0;
-            int cCnt = 0;
+            var xlWorkSheet = (Worksheet)xlWorkBook.Worksheets.get_Item(supplierType.SheetNumber);
+            int lastUsedRow = xlWorkSheet.Cells.SpecialCells(Excel.XlCellType.xlCellTypeLastCell, Type.Missing).Row;
 
-            xlApp = new Excel.ApplicationClass();
-            xlWorkBook = xlApp.Workbooks.Open(priceFileName, 0, true, 5, "", "", true, Microsoft.Office.Interop.Excel.XlPlatform.xlWindows, "\t", false, false, 0, true, 1, 0);
+            //начало поиска
+            var searchResult = new List<ResultRowCell>();
 
-            int qtySheets = xlWorkBook.Worksheets.Count;
-
-            xlWorkSheet = (Excel.Worksheet)xlWorkBook.Worksheets.get_Item(1);
-            //Workbook.Worksheets.get_item
-            range = xlWorkSheet.UsedRange;
-
-            for (rCnt = 1; rCnt <= range.Rows.Count; rCnt++)
+            for (int currentRow = supplierType.ListCell[0].Row; currentRow <= lastUsedRow; currentRow++)
             {
-                for (cCnt = 1; cCnt <= range.Columns.Count; cCnt++)
+
+                var resultRowCell = new ResultRowCell();
+                resultRowCell.Clear();
+                for (int iCell = 0; iCell < supplierType.ListCell.Count; iCell++)
                 {
-                    str = (string)(range.Cells[rCnt, cCnt] as Excel.Range).Value2;
-                    MessageBox.Show(str);
+                    //для всех ячеек получаем их значения
+                    int currentColumn = supplierType.ListCell[iCell].Col;
+
+                    //проверка ячейки на существование.
+                    var value = ((Range) xlWorkSheet.Cells[currentRow, currentColumn]).Value;
+                    string result = "";
+                    if (value != null)
+                        result = value.ToString();
+                    else
+                        result = "";
+
+                    resultRowCell.VSupplierName = supplierType.Name;
+                    resultRowCell.Add(new ResultCell(currentRow, currentColumn, result,
+                                                     supplierType.ListCell[iCell].Name));
                 }
+
+                //ищем по всем словам, по всем ячейкам
+                int qty = 0;
+                if ((qty = ParseRow(resultRowCell, listOfWords)) > 0)
+                {
+                    //MessageBox.Show(@"Current row: " + currentRow.ToString());
+                    resultRowCell.qty = qty;
+                    searchResult.Add(resultRowCell);
+                }
+
             }
 
-            xlWorkBook.Close(true, null, null);
+            //конец поиска
+            xlWorkBook.Close(false, null, null);
             xlApp.Quit();
 
-            releaseObject(xlWorkSheet);
-            releaseObject(xlWorkBook);
-            releaseObject(xlApp);
+            ReleaseObject(xlWorkSheet);
+            ReleaseObject(xlWorkBook);
+            ReleaseObject(xlApp);
+
+
+            return searchResult;
         }
 
-        private void releaseObject(object obj)
+        private static int ParseRow(ResultRowCell resultRowCell, string[] listOfWords)
+        {
+            int value = 0;
+            for (int i = 0; i < listOfWords.Length; i++)
+            {
+                value += resultRowCell.ParseListByString(listOfWords[i]);
+            }
+            if (value != listOfWords.Length)
+                value = 0;
+
+            return value;
+        }
+
+        private static void ReleaseObject(object obj)
         {
             try
             {
@@ -61,7 +97,7 @@ namespace PriceChecker.search
             {
                 GC.Collect();
             }
-        } 
+        }
 
     }
 }

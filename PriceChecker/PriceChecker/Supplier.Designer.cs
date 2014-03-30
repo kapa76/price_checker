@@ -59,12 +59,15 @@
             this.listSynonim = new System.Windows.Forms.ListBox();
             this.label7 = new System.Windows.Forms.Label();
             this.listWords = new System.Windows.Forms.ListBox();
+            this.sheet = new System.Windows.Forms.NumericUpDown();
+            this.label8 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.grid)).BeginInit();
             this.gridMenu.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.col)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.row)).BeginInit();
             this.listWordsMenu.SuspendLayout();
             this.listSynonimMenu.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.sheet)).BeginInit();
             this.SuspendLayout();
             // 
             // label1
@@ -219,16 +222,46 @@
             // col
             // 
             this.col.Location = new System.Drawing.Point(439, 248);
+            this.col.Maximum = new decimal(new int[] {
+            1410065408,
+            2,
+            0,
+            0});
+            this.col.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
             this.col.Name = "col";
             this.col.Size = new System.Drawing.Size(84, 20);
             this.col.TabIndex = 14;
+            this.col.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
             // 
             // row
             // 
             this.row.Location = new System.Drawing.Point(356, 248);
+            this.row.Maximum = new decimal(new int[] {
+            10000000,
+            0,
+            0,
+            0});
+            this.row.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
             this.row.Name = "row";
             this.row.Size = new System.Drawing.Size(77, 20);
             this.row.TabIndex = 15;
+            this.row.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
             // 
             // btnAddColumn
             // 
@@ -277,7 +310,7 @@
             this.deleteSynonim,
             this.addSynonim});
             this.listSynonimMenu.Name = "listSynonimMenu";
-            this.listSynonimMenu.Size = new System.Drawing.Size(180, 70);
+            this.listSynonimMenu.Size = new System.Drawing.Size(180, 48);
             // 
             // deleteSynonim
             // 
@@ -319,11 +352,39 @@
             this.listWords.TabIndex = 19;
             this.listWords.SelectedIndexChanged += new System.EventHandler(this.ListWordsSelectedIndexChanged);
             // 
+            // sheet
+            // 
+            this.sheet.Location = new System.Drawing.Point(356, 154);
+            this.sheet.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.sheet.Name = "sheet";
+            this.sheet.Size = new System.Drawing.Size(77, 20);
+            this.sheet.TabIndex = 24;
+            this.sheet.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(356, 139);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(71, 13);
+            this.label8.TabIndex = 23;
+            this.label8.Text = "номер листа";
+            // 
             // Supplier
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(712, 564);
+            this.Controls.Add(this.sheet);
+            this.Controls.Add(this.label8);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.listSynonim);
             this.Controls.Add(this.label7);
@@ -351,6 +412,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.row)).EndInit();
             this.listWordsMenu.ResumeLayout(false);
             this.listSynonimMenu.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.sheet)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -388,5 +450,7 @@
         private System.Windows.Forms.ListBox listSynonim;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.ListBox listWords;
+        private System.Windows.Forms.NumericUpDown sheet;
+        private System.Windows.Forms.Label label8;
     }
 }

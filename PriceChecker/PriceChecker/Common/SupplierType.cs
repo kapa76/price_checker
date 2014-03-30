@@ -16,6 +16,7 @@ namespace PriceChecker.Common
         public string Name;
         public List<Cell> ListCell;
         public ListWords ListWords;
+        public int SheetNumber;
 
         public SupplierType()
         {
