@@ -4,6 +4,7 @@ using System.Text;
 
 namespace PriceChecker.Common
 {
+    public enum SupplierEditMode { Add, Edit }
 
     public class FieldType
     {

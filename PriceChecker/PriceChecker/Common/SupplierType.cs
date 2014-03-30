@@ -15,9 +15,12 @@ namespace PriceChecker.Common
     {
         public string Name;
         public List<Cell> ListCell;
+        public ListWords ListWords;
+
         public SupplierType()
         {
             ListCell = new List<Cell>();
+            ListWords = new ListWords();
         }
     }
 }

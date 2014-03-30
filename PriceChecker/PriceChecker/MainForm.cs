@@ -8,6 +8,7 @@ using System.IO;
 using System.Text;
 using System.Windows.Forms;
 using PriceChecker.Common;
+using PriceChecker.search;
 
 namespace PriceChecker
 {
@@ -19,6 +20,7 @@ namespace PriceChecker
         public List<SupplierType> ListSupplier;
 
         #region forms
+
         public MainForm()
         {
             InitializeComponent();
@@ -33,7 +35,7 @@ namespace PriceChecker
             LoadData();
             LoadSupplier();
 
-            if( ListSupplier.Count > 0 )
+            if (ListSupplier.Count > 0)
             {
                 LoadItems(supplierList, ListSupplier);
             }
@@ -46,7 +48,7 @@ namespace PriceChecker
         private static void LoadItems(ListBox listBox, List<SupplierType> listSupplier)
         {
             listBox.Items.Clear();
-            for( int i=0; i<listSupplier.Count; i++)
+            for (int i = 0; i < listSupplier.Count; i++)
             {
                 listBox.Items.Add(listSupplier[i].Name);
             }
@@ -55,18 +57,38 @@ namespace PriceChecker
         private void BtnAddSupplierClick(object sender, EventArgs e)
         {
             var supplier = new Supplier();
+            supplier.vSupplierEditMode = SupplierEditMode.Add;
+
             if (supplier.ShowDialog() == DialogResult.OK)
             {
                 ListSupplier.Add(supplier.Supp);
+                supplierList.Items.Clear();
+                for(int i=0; i<ListSupplier.Count; i++)
+                {
+                    supplierList.Items.Add(ListSupplier[i].Name);
+                }
+
             }
+
+            if (supplierList.Items.Count > 0 && supplierList.SelectedIndex == -1)
+                supplierList.SelectedIndex = 0;
+
         }
 
         private void AddSupplierClick(object sender, EventArgs e)
         {
             var supplier = new Supplier();
+            supplier.vSupplierEditMode = SupplierEditMode.Add;
+
             if (supplier.ShowDialog() == DialogResult.OK)
             {
+                ListSupplier.Add(supplier.Supp);
 
+                supplierList.Items.Clear();
+                for (int i = 0; i < ListSupplier.Count; i++)
+                {
+                    supplierList.Items.Add(ListSupplier[i].Name);
+                }
             }
 
             if (supplierList.Items.Count > 0 && supplierList.SelectedIndex == -1)
@@ -134,22 +156,6 @@ namespace PriceChecker
             Application.Exit();
         }
 
-        private void LoadSupplier()
-        {
-            var reader = new System.Xml.Serialization.XmlSerializer(typeof(List<SupplierType>));
-            var file = new FileStream("supplier.xml", FileMode.Open);
-            ListSupplier = (List<SupplierType>)reader.Deserialize(file);
-            file.Close();
-        }
-
-        private void SaveSupplier()
-        {
-            var reader = new System.Xml.Serialization.XmlSerializer(typeof(List<SupplierType>));
-            var file = new FileStream("supplier.xml", FileMode.Create);
-            reader.Serialize(file, ListSupplier);
-            file.Close(); 
-        }
-
         private void ListWordsSelectedIndexChanged(object sender, EventArgs e)
         {
             if (listWords.SelectedIndex != -1)
@@ -179,7 +185,7 @@ namespace PriceChecker
             LocalWords._words = (List<Words>)reader.Deserialize(file);
             file.Close();
 
-            DrawList( LocalWords._words );
+            DrawList(LocalWords._words);
         }
 
         private void DrawList(List<Words> w)
@@ -187,7 +193,7 @@ namespace PriceChecker
             listSynonim.Items.Clear();
             listWords.Items.Clear();
 
-            for( int i=0; i<w.Count; i++)
+            for (int i = 0; i < w.Count; i++)
             {
                 listWords.Items.Add(w[i]._words);
             }
@@ -198,7 +204,7 @@ namespace PriceChecker
             supplierList.Items.Clear();
             comboBoxSupplier.Items.Clear();
 
-            for( int i=0; i< ListSupplier.Count; i++ )
+            for (int i = 0; i < ListSupplier.Count; i++)
             {
                 supplierList.Items.Add(ListSupplier[i].Name);
                 comboBoxSupplier.Items.Add(ListSupplier[i].Name);
@@ -209,16 +215,16 @@ namespace PriceChecker
 
             if (comboBoxSupplier.Items.Count > 0)
                 comboBoxSupplier.SelectedIndex = 0;
-        
+
         }
 
         private void DeleteSupplierClick(object sender, EventArgs e)
         {
-            if(supplierList.SelectedIndex != -1)
+            if (supplierList.SelectedIndex != -1)
             {
                 for (int i = 0; i < ListSupplier.Count; i++)
                 {
-                    if (ListSupplier[i].Name.Contains((string) supplierList.Items[supplierList.SelectedIndex]))
+                    if (ListSupplier[i].Name.Contains((string)supplierList.Items[supplierList.SelectedIndex]))
                     {
                         ListSupplier.RemoveAt(i);
                     }
@@ -227,41 +233,28 @@ namespace PriceChecker
             }
         }
 
-        private void RemoveSupplierFromListClick(object sender, EventArgs e)
-        {
-            if( searchGrid.SelectedRows.Count > 0)
-                searchGrid.Rows.Remove(searchGrid.SelectedRows[0]);
-        }
 
         private void BtnChangeFileClick(object sender, EventArgs e)
         {
             var openFile = new OpenFileDialog();
-            if( openFile.ShowDialog() == DialogResult.OK)
+            if (openFile.ShowDialog() == DialogResult.OK)
             {
                 fileNameChange.Text = openFile.FileName;
             }
         }
 
-        private void AddSupplierToSearchGrid(object sender, EventArgs e)
-        {
-            var val = new DataGridViewRow();
 
-            val.CreateCells(searchGrid, "cell1", "cell2");
-            val.Cells[0].Value = comboBoxSupplier.Items[comboBoxSupplier.SelectedIndex];
-            val.Cells[1].Value = fileNameChange.Text; ;
-            searchGrid.Rows.Add(val);
-        }
 
-#endregion forms
+        #endregion forms
 
         #region search
 
         private void SearchClick(object sender, EventArgs e)
         {
             var lf = new List<SupplierFiles>();
-            if(searchString.Text.Length > 0 )
+            if (searchString.Text.Length > 0)
             {
-                for( int i=0; i< searchGrid.Rows.Count; i++)
+                for (int i = 0; i < searchGrid.Rows.Count; i++)
                 {
                     var s = new SupplierFiles();
                     s.NameSupplier = searchGrid.Rows[i].Cells[0].Value.ToString();
@@ -275,8 +268,8 @@ namespace PriceChecker
 
         private static void Search(string searchString, List<Words> words, List<SupplierType> listSupplier, List<SupplierFiles> lf)
         {
-            
-            foreach(SupplierFiles supplierFiles in lf)
+            var searcher = new Search();
+            foreach (SupplierFiles supplierFiles in lf)
             {
                 var nameSupplier = supplierFiles.NameSupplier;
                 var priceFileName = supplierFiles.NamePriceFile;
@@ -286,7 +279,7 @@ namespace PriceChecker
                 string[] listOfWords = GetListWords(words, searchString.Split(','));
 
 
-                SearchByFile(listOfWords, supplierType, priceFileName);
+                searcher.SearchByFile(listOfWords, supplierType, priceFileName);
 
             }
 
@@ -295,14 +288,7 @@ namespace PriceChecker
 
         }
 
-        private static void SearchByFile(string[] listOfWords, SupplierType supplierType, string priceFileName)
-        {
-            
 
-
-
-
-        }
 
         private static string[] GetListWords(List<Words> words, string[] searchWords)
         {
@@ -316,7 +302,7 @@ namespace PriceChecker
                     if (words[j]._words.Contains(searchWords[i]))
                     {
                         //забираем все синонимы
-                        for(int k=0; k<words[j]._synonim.Count;k++)
+                        for (int k = 0; k < words[j]._synonim.Count; k++)
                         {
                             wp.Add(words[j]._synonim[k]);
                             finded = true;
@@ -324,7 +310,7 @@ namespace PriceChecker
                     }
                 }
 
-                if( !finded )
+                if (!finded)
                     wp.Add(searchWords[i]);
 
             }
@@ -335,7 +321,7 @@ namespace PriceChecker
         private static SupplierType GetSupplierByName(List<SupplierType> listSupplier, string nameSupplier)
         {
             var value = new SupplierType();
-            foreach(SupplierType st in listSupplier )
+            foreach (SupplierType st in listSupplier)
             {
                 if (st.Name.Contains(nameSupplier))
                 {
@@ -346,6 +332,56 @@ namespace PriceChecker
             return value;
         }
 
-#endregion search
+        #endregion search
+
+        #region supplier
+
+        private void SupplierListDoubleClick(object sender, EventArgs e)
+        {
+            var supplier = new Supplier();
+            
+            supplier.vSupplierEditMode = SupplierEditMode.Edit;
+            var supplierName = (string)supplierList.Items[supplierList.SelectedIndex];
+            supplier.Supp = GetSupplierByName(ListSupplier, supplierName);
+            if (supplier.ShowDialog() == DialogResult.OK)
+            {
+                //ListSupplier.Add(supplier.Supp);
+            }
+        }
+
+        private void AddSupplierToSearchGrid(object sender, EventArgs e)
+        {
+            var val = new DataGridViewRow();
+
+            val.CreateCells(searchGrid, "cell1", "cell2");
+            val.Cells[0].Value = comboBoxSupplier.Items[comboBoxSupplier.SelectedIndex];
+            val.Cells[1].Value = fileNameChange.Text; ;
+            searchGrid.Rows.Add(val);
+        }
+
+        private void RemoveSupplierFromListClick(object sender, EventArgs e)
+        {
+            if (searchGrid.SelectedRows.Count > 0)
+                searchGrid.Rows.Remove(searchGrid.SelectedRows[0]);
+        }
+
+        private void LoadSupplier()
+        {
+            var reader = new System.Xml.Serialization.XmlSerializer(typeof(List<SupplierType>));
+            var file = new FileStream("supplier.xml", FileMode.Open);
+            ListSupplier = (List<SupplierType>)reader.Deserialize(file);
+            file.Close();
+        }
+
+        private void SaveSupplier()
+        {
+            var reader = new System.Xml.Serialization.XmlSerializer(typeof(List<SupplierType>));
+            var file = new FileStream("supplier.xml", FileMode.Create);
+            reader.Serialize(file, ListSupplier);
+            file.Close();
+        }
+
+        #endregion supplier
+
     }
 }
